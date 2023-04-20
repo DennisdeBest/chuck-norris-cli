@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+
+# Check if curl is installed
+if ! command -v curl &> /dev/null; then
+    echo "Error: curl is not installed."
+    echo "Please install curl using the package manager for your system (e.g., apt, yum, or brew)."
+    exit 1
+fi
+
+# Check if jq is installed
+if ! command -v jq &> /dev/null; then
+    echo "Error: jq is not installed."
+    echo "Please install jq using the package manager for your system (e.g., apt, yum, or brew)."
+    exit 1
+fi
+
+# Function to center the text in the terminal
+center() {
+    term_width=$(tput cols)
+    term_height=$(tput lines)
+    input_text=$1
+    max_line_length=$((term_width - 4)) # Leave some space on the sides
+
+    # Wrap long lines at the nearest space character
+    lines=()
+    while [ ${#input_text} -gt $max_line_length ]; do
+        wrapped_line="${input_text:0:$max_line_length}"
+        last_space_index=$(echo "$wrapped_line" | awk 'BEGIN {FS=" "} {print length($0)-length($NF)}')
+        if [ $last_space_index -gt 0 ]; then
+            wrapped_line="${input_text:0:$last_space_index}"
+            input_text="${input_text:$last_space_index}"
+        else
+            input_text="${input_text:$max_line_length}"
+        fi
+        lines+=("$wrapped_line")
+    done
+    lines+=("$input_text")
+
+    printf "\033[$((term_height / 2 - ${#lines[@]} / 2 - 2));0H"
+    printf '=%.0s' $(seq 1 $term_width)
+
+    for ((i = 0; i < ${#lines[@]}; i++)); do
+        padding="$(printf '%0.1s' ' '{1..500})"
+        vertical_position=$((term_height / 2 - ${#lines[@]} / 2 + i))
+        printf "\033[${vertical_position};0H"  # Position the cursor vertically
+        printf '%*.*s %s %*.*s\n' 0 "$(((term_width - 2 - ${#lines[i]}) / 2))" "$padding" "${lines[i]}" 0 "$(((term_width - 1 - ${#lines[i]}) / 2))" "$padding"
+    done
+
+    printf "\n"
+     printf '=%.0s' $(seq 1 $term_width)
+     printf "\033[$((term_height / 2 + ${#lines[@]} / 2));0H"
+}
+
+# Function to display a line of dots at the bottom that fills the whole bottom row
+display_dots() {
+    term_width=$(tput cols)
+    term_height=$(tput lines)
+    for ((i=0; i < 30; i++)); do
+	dots=""
+        for ((j=0; j < term_width / 30; j++)); do
+    		dots+="."
+	done
+        echo -ne "\033[${term_height};$((i * term_width / 30))H$dots"
+        sleep 1
+    done
+}
+
+while true; do
+    joke=$(curl -s https://api.chucknorris.io/jokes/random | jq -r '.value')
+    clear
+    center "$joke"
+    display_dots &
+    sleep 30
+    kill %1
+done
+
