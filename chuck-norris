@@ -2,6 +2,84 @@
 
 DELAY=${DELAY:-30}
 
+# Set the color codes
+BLACK='\033[0;30m'
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+MAGENTA='\033[0;35m'
+CYAN='\033[0;36m'
+WHITE='\033[0;37m'
+BOLD_BLACK='\033[1;30m'
+BOLD_RED='\033[1;31m'
+BOLD_GREEN='\033[1;32m'
+BOLD_YELLOW='\033[1;33m'
+BOLD_BLUE='\033[1;34m'
+BOLD_MAGENTA='\033[1;35m'
+BOLD_CYAN='\033[1;36m'
+BOLD_WHITE='\033[1;37m'
+NC='\033[0m'
+
+# Check the value of the COLOR variable and set a corresponding color code
+case "$COLOR" in
+  "black")
+    COLOR_CODE=$BLACK
+    ;;
+  "red")
+    COLOR_CODE=$RED
+    ;;
+  "green")
+    COLOR_CODE=$GREEN
+    ;;
+  "yellow")
+    COLOR_CODE=$YELLOW
+    ;;
+  "blue")
+    COLOR_CODE=$BLUE
+    ;;
+  "magenta")
+    COLOR_CODE=$MAGENTA
+    ;;
+  "cyan")
+    COLOR_CODE=$CYAN
+    ;;
+  "white")
+    COLOR_CODE=$WHITE
+    ;;
+  "bold_black")
+    COLOR_CODE=$BOLD_BLACK
+    ;;
+  "bold_red")
+    COLOR_CODE=$BOLD_RED
+    ;;
+  "bold_green")
+    COLOR_CODE=$BOLD_GREEN
+    ;;
+  "bold_yellow")
+    COLOR_CODE=$BOLD_YELLOW
+    ;;
+  "bold_blue")
+    COLOR_CODE=$BOLD_BLUE
+    ;;
+  "bold_magenta")
+    COLOR_CODE=$BOLD_MAGENTA
+    ;;
+  "bold_cyan")
+    COLOR_CODE=$BOLD_CYAN
+    ;;
+  "bold_white")
+    COLOR_CODE=$BOLD_WHITE
+    ;;
+  "default")
+    COLOR_CODE=$NC
+    ;;
+  *)
+    echo "Error: invalid color. Available colors are black, red, green, yellow, blue, magenta, cyan, white, bold_black, bold_red, bold_green, bold_yellow, bold_blue, bold_magenta, bold_cyan, bold_white, and default."
+    exit 1
+    ;;
+esac
+
 # Check if curl is installed
 if ! command -v curl &>/dev/null; then
   echo "Error: curl is not installed."
@@ -38,19 +116,21 @@ center() {
   done
   lines+=("$input_text")
 
-  printf "\033[%d;0H" $((term_height / 2 - ${#lines[@]} / 2 - 2))
+  printf "${COLOR_CODE}\033[%d;0H" $((term_height / 2 - ${#lines[@]} / 2 - 2))
   printf '=%.0s' $(seq 1 "$term_width")
 
   for ((i = 0; i < ${#lines[@]}; i++)); do
     padding="$(printf '%0.1s' ' '{1..500})"
     vertical_position=$((term_height / 2 - ${#lines[@]} / 2 + i))
-    printf "\033[%d;0H" ${vertical_position} # Position the cursor vertically
+    printf "${COLOR_CODE}\033[%d;0H" ${vertical_position} # Position the cursor vertically
     printf '%*.*s %s %*.*s\n' 0 "$(((term_width - 2 - ${#lines[i]}) / 2))" "$padding" "${lines[i]}" 0 "$(((term_width - 1 - ${#lines[i]}) / 2))" "$padding"
   done
 
   printf "\n"
   printf '=%.0s' $(seq 1 "$term_width")
-  printf "\033[%d;0H" $((term_height / 2 + ${#lines[@]} / 2))
+  printf "${COLOR_CODE}\033[%d;0H" $((term_height / 2 + ${#lines[@]} / 2))
+
+  printf "${NC}"
 }
 
 # Function to display a line of dots at the bottom that fills the whole bottom row
