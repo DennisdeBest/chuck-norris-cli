@@ -21,6 +21,7 @@ BOLD_CYAN='\033[1;36m'
 BOLD_WHITE='\033[1;37m'
 NC='\033[0m'
 
+if [ -n "${COLOR}" ]; then
 # Check the value of the COLOR variable and set a corresponding color code
 case "$COLOR" in
   "black")
@@ -79,6 +80,9 @@ case "$COLOR" in
     exit 1
     ;;
 esac
+else
+  COLOR_CODE=$NC
+fi
 
 # Check if curl is installed
 if ! command -v curl &>/dev/null; then

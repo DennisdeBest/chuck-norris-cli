@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.4
+
+- Fix setting default color if no $COLOR env var is set
+
 ## 0.0.3
 
 - Add colors to the output
